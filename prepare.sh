@@ -47,7 +47,7 @@ else
   cd openssl || exit 1
 fi
 make -j$(nproc)
-make install install_sw install_ssldirs
+make install_sw install_ssldirs
 echo '/usr/local/lib64' | sudo tee /etc/ld.so.conf.d/openssl.conf
 ldconfig
 ln -sf /usr/local/bin/openssl /usr/bin/openssl
