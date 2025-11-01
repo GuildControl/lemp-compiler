@@ -21,7 +21,6 @@ apt install -y build-essential cmake git wget tar \
 # =============================================================================
 echo "Установка OpenSSL с поддержкой QUIC..."
 cd /tmp
-#!/bin/bash
 
 if [ ! -d "openssl" ]; then
   echo "Папка openssl не найдена. Клонируем и собираем OpenSSL..."
