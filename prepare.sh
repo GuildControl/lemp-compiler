@@ -8,7 +8,6 @@
 set -e  # Остановка при любой ошибке
 
 echo "Обновление системы и установка зависимостей..."
-apt update
 apt install -y build-essential cmake git wget tar \
     libpcre3 libpcre3-dev zlib1g-dev libssl-dev \
     libgd-dev libgeoip-dev libxslt1-dev libperl-dev \
@@ -22,18 +21,32 @@ apt install -y build-essential cmake git wget tar \
 # =============================================================================
 echo "Установка OpenSSL с поддержкой QUIC..."
 cd /tmp
-git clone https://github.com/openssl/openssl.git
-cd openssl
-./Configure \
-  --prefix=/usr/local \
-  --openssldir=/usr/local/ssl \
-  shared zlib \
-  enable-quic \
-  enable-tls1_2 \
-  enable-tls1_3 \
-  no-weak-ssl-ciphers \
-  -fPIC \
-  linux-x86_64
+#!/bin/bash
+
+if [ ! -d "openssl" ]; then
+  echo "Папка openssl не найдена. Клонируем и собираем OpenSSL..."
+  
+  git clone https://github.com/openssl/openssl.git
+  cd openssl || exit 1
+  
+  ./Configure \
+    --prefix=/usr/local \
+    --openssldir=/usr/local/ssl \
+    shared zlib \
+    enable-quic \
+    enable-tls1_2 \
+    enable-tls1_3 \
+    no-weak-ssl-ciphers \
+    -fPIC \
+    linux-x86_64
+  
+  make -j$(nproc)
+  
+  echo "Сборка OpenSSL завершена."
+else
+  echo "Папка openssl уже существует. Пропускаем клонирование и сборку."
+  cd openssl || exit 1
+fi
 make -j$(nproc)
 make install_sw install_ssldirs
 ln -sf /usr/local/bin/openssl /usr/bin/openssl
